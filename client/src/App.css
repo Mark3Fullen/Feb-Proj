@@ -1,0 +1,20 @@
+.homeApp {
+  align-items: center;
+  margin: 2vw auto;
+}
+
+.homeHeader{
+  text-align: center;
+  padding: 20px;
+}
+
+.homeAppMenu{
+  float: left;
+  margin-top: 15px;
+  background-color: grey;
+  border-radius: 25%;
+}
+
+.homeMenuMenu{
+  align-items: center;
+}
