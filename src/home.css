@@ -1,0 +1,14 @@
+.homeApp {
+  display: flex;
+  text-align: center;
+  margin: 2vw auto;
+}
+
+.homeHeader{
+  margin: 0 auto;
+}
+
+.homeAppMenu{
+  float: left;
+  padding: 20px;
+}
