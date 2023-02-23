@@ -24,6 +24,7 @@ const App = () => {
 
   const updateUser = (v) => {
     return setUser((prev) => {
+      console.log({...user, ...v});
       return {...user, ...v};
     });
   }
@@ -33,7 +34,7 @@ const App = () => {
 
     const newPerson = {...user};
 
-    await fetch("http://localhost:5000/register", {
+    await fetch("http://localhost:5000/user/register", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -42,6 +43,7 @@ const App = () => {
     })
     .catch(e => {
       window.alert(e);
+      console.log(e);
       return;
     });
 
