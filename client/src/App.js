@@ -12,6 +12,11 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
 const App = () => {
+  
+  const nav = useNavigate();
+  localStorage.setItem('token', token);
+
+  const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
 
   const [menuClicked, setMenuClicked] = useState(false);
   const [user, setUser] = useState({
@@ -19,8 +24,11 @@ const App = () => {
     email: "",
     password: ""
   })
-
-  const nav = useNavigate();
+  const [activeUser, setActiveUser] = useState({
+    name: "",
+    email: "",
+    password: ""
+  })
 
   const updateUser = (v) => {
     return setUser((prev) => {
@@ -41,14 +49,39 @@ const App = () => {
       },
       body: JSON.stringify(newPerson),
     })
+    .then(() => {
+      setActiveUser(newPerson);
+      setUser({ name: "", email: "", password: ""});
+      nav('/');
+    })
     .catch(e => {
       window.alert(e);
       console.log(e);
       return;
     });
+  }
 
-    setUser({ name: "", email: "", password: "" });
-    nav('/');
+  async function onUserLogin(e) {
+    e.preventDefault();
+
+    const login = { email: user.email, password: user.password};
+
+    await fetch("http://localhost:5000/user/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(login),
+    })
+    .then(() => {
+      setUser({ name: "", email: "", password: ""});
+      nav('/');
+    })
+    .catch(e => {
+      window.alert(e);
+      console.log(e);
+      return;
+    })
   }
 
   return (
@@ -79,9 +112,13 @@ const App = () => {
                 <Button type="submit" variant="contained">Create User</Button>
               </form>
 
-              <form>
-
+              <form onSubmit={onUserLogin}>
+                <TextField label="Email" variant="standard" onChange={e => updateUser({ email: e.target.value })}/>
+                <TextField label="Password" variant="standard" onChange={e => updateUser({ password: e.target.value })}/>
+                <Button type="submit" variant="contained">Login</Button>
               </form>
+
+              <h4>{activeUser.name ? activeUser.name : "Not Logged in"}</h4>
 
             </Stack>
 
