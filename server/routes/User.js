@@ -21,8 +21,10 @@ router.post('/register', async (req, res) => {
 
     
         const savedUser = await user.save();
-        console.log(savedUser);
-        res.json(savedUser);
+
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+        console.log(savedUser, { token });
+        res.status(200).json({ savedUser, token });
 
     } catch (err) {
         console.error('Failed to register user', err);
@@ -44,7 +46,7 @@ router.post('/login', async (req, res) => {
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
         console.log({token});
-        res.json({ token });
+        res.json({ user, token });
 
     } catch (err) {
         res.status(500).json({ error: 'Could not log in'})

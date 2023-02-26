@@ -3,18 +3,32 @@
   margin: 2vw auto;
 }
 
-.homeHeader{
+.homeHeader {
   text-align: center;
   padding: 20px;
 }
 
-.homeAppMenu{
+.homeAppMenu {
   float: left;
   margin-top: 15px;
   background-color: grey;
   border-radius: 25%;
 }
 
-.homeMenuStack{
+.homeMenuStack {
+  align-items: center;
+}
+
+.userSettings {
+  width: 20%;
+  padding: 25px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.userForm {
+  display: flex;
+  flex-direction: column;
   align-items: center;
 }
