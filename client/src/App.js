@@ -14,7 +14,10 @@ import Button from '@mui/material/Button';
 const App = () => {
   
   const nav = useNavigate();
-  localStorage.setItem('token', token);
+  let token = localStorage.getItem('token')
+  console.log(token);
+  if (token) localStorage.setItem('token', token);
+  
 
   const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
 
