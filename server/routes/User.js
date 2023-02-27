@@ -38,11 +38,17 @@ router.post('/login', async (req, res) => {
         const {email, password} = req.body;
         const user = await User.findOne({ email });
 
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (!user) {
+            console.log("User not found");
+            return res.status(404).json({ message: 'User not found' });
+        }
 
         const isMatch = await bcrypt.compare(password, user.password);
 
-        if (!isMatch) return res.status(404).json({ message: 'Invalid Credentials'});
+        if (!isMatch) {
+            console.log("Invalid Credentials");
+            return res.status(404).json({ message: 'Invalid Credentials'});
+        }
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
         console.log({ user, token});
@@ -57,7 +63,10 @@ const verifyToken = (req, res, next) => {
     const authHeader = req.headers.authorization
     const token = authHeader && authHeader.split(' ')[1];
 
-    if (!token) return res.status(401).json({ message: 'Unauthorized' })
+    if (!token) {
+        console.log("No token")
+        return res.status(401).json({ message: 'Unauthorized' })
+    }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) return res.status(403).json({ message: 'Invalid token' })
@@ -79,12 +88,16 @@ router.patch('/:id', verifyToken, async (req, res) => {
         const { name, email } = req.body;
 
         const user  = await User.findById(id);
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (!user) {
+            console.log("User not found");
+            return res.status(404).json({ message: 'User not found' });
+        }
 
         if (name) user.name = name;
         if (email) user.email = email;
 
         await user.save();
+        console.log("Patched")
         res.status(200).json({ user });
     } catch (err) {
         console.error(err);
@@ -93,13 +106,16 @@ router.patch('/:id', verifyToken, async (req, res) => {
 })
 
 router.delete('/:id', verifyToken, async (req, res) => {
-    console.log('Wokring...');
     try {
 
         const deletedUser = await User.findByIdAndDelete(req.params.id);
 
-        if (!deletedUser) return res.status(403).json({ message: 'User not found' });
+        if (!deletedUser) {
+            console.log("User not found");
+            return res.status(403).json({ message: 'User not found' });
+        }
 
+        console.log("Deleting user successfully")
         res.status(200).json({ message: 'User deleted successfully' });
 
     } catch (err) {

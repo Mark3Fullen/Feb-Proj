@@ -32,6 +32,7 @@ const App = () => {
   const [activeUser, setActiveUser] = useState({})
   const [userPatchName, setUserPatchName] = useState("")
   const [errorMSG, setErrorMSG] = useState("")
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   // console.log(token)
   // console.log(activeUser)
@@ -58,9 +59,11 @@ const App = () => {
     })
     .then(res => res.json())
     .then((res) => {
+      console.log(res);
       token = res.token;
       localStorage.setItem('token', token);
-      setActiveUser(res.user);
+      setActiveUser(res.savedUser);
+      console.log({ activeUser} , localStorage.getItem('token'));
       setUser({ name: "", email: "", password: ""});
       nav('/');
     })
@@ -73,8 +76,14 @@ const App = () => {
 
   async function onUserLogin(e) {
     e.preventDefault();
+    setErrorMSG("");
 
     const login = { email: user.email, password: user.password};
+
+    if (!login.email || !login.password) {
+      setErrorMSG("Please add credentials")
+      return;
+    }
 
     await fetch("http://localhost:5000/user/login", {
       method: "POST",
@@ -84,21 +93,25 @@ const App = () => {
       body: JSON.stringify(login),
     })
     .then(res => {
+      console.log(res.status)
       if (res.status === 200) {
         return res.json()
       } else {
-        console.log(res);
-        throw new Error(res.message)
+        let err = res.json().Object.message
+        console.log(err)
+        throw new Error(err);
       }
     })
     .then((res) => {
       token = res.token;
       localStorage.setItem('token', token);
+      console.log(localStorage.getItem('token'));
       setActiveUser(res.user);
       setUser({ name: "", email: "", password: ""});
       nav('/');
     })
     .catch(e => {
+      console.log(e);
       setErrorMSG(e.message ? e.message : null);
       console.log(errorMSG);
     })
@@ -149,19 +162,20 @@ const App = () => {
     <Box className="homeApp">
       <div className="homeHeader">
         <Fab variant="extended" size="large" aria-label="add">App Name</Fab>
-        <Box className="userSettings">
+        <Box className="userSettingsBox">
           <Accordion>
 
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
               <Typography>Account</Typography>
             </AccordionSummary>
 
-            <AccordionDetails>
+            <AccordionDetails className='userSettingDetails'>
               {(!Object.keys(activeUser).length < 1) ? <div>
                 <Typography>{`Welcome ${activeUser.name}`}</Typography>
                 <Button variant="contained" onClick={() => {
                   localStorage.removeItem('activeUser');
-                  localStorage.removeItem('token');                  
+                  localStorage.removeItem('token');
+                  setActiveUser("");              
                 }}>Logout</Button>
               </div> : <div>
                 <form className='userForm' onSubmit={onUserSubmit}>
@@ -193,18 +207,44 @@ const App = () => {
               <Typography>Settings</Typography>
             </AccordionSummary>
 
-            <AccordionDetails>
+            <AccordionDetails className='userSettingDetails'>
               {(Object.keys(activeUser).length < 1) ? "Please login or register" : 
                 <div>
                   <form onSubmit={onUserPatch}>
                     <TextField type="text" label="Name" variant="standard" onChange={(e) => setUserPatchName(e.target.value)}/>
                     <Button type="submit" variant="contained">Change Name</Button>
                   </form>
-                  <Button variant="contained" onClick={e => onUserDelete()}>Delete User</Button>
+                  <Button variant="contained" onClick={e => onUserDelete(e)}>Delete User</Button>
                 </div>}
             </AccordionDetails>
 
           </Accordion>
+        </Box>
+        <Box className="userDrawerBox">
+          <MenuOutlinedIcon onClick={() => setDrawerOpen(true)} />
+          <Drawer open={drawerOpen} sx={{
+            width: '350px',
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: '350px',
+              boxSizing: 'border-box',
+            },
+          }}>
+            <Stack className='drawerStack'>
+
+              <MenuOutlinedIcon onClick={() => setDrawerOpen(false)} />
+
+              <br/>
+
+              <a>Bruh</a>
+
+              <br/>
+
+              <a>Moment</a>
+
+            </Stack>
+
+          </Drawer>
         </Box>   
       </div>
 

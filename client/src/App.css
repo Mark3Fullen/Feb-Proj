@@ -19,9 +19,9 @@
   align-items: center;
 }
 
-.userSettings {
+.userSettingsBox {
   width: 20%;
-  padding: 25px;
+  padding: 75px;
   position: absolute;
   top: 0;
   right: 0;
@@ -31,4 +31,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.userDrawerBox{
+  width: 20%;
+  position: absolute;
+  left: 0;
+}
+
+.drawerStack{
+  padding: 75px;
+  align-items: center;
+  text-align: center;
 }
