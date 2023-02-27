@@ -22,18 +22,20 @@ const App = () => {
 
   let token = ""
   
-  let authHeader = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+  // let authHeader = { Authorization: `Bearer ${localStorage.getItem('token')}` };
 
   const [user, setUser] = useState({
     name: "",
     email: "",
     password: ""
   })
-  const [activeUser, setActiveUser] = useState({
-    name: "",
-    email: "",
-    password: ""
-  })
+  const [activeUser, setActiveUser] = useState({})
+  const [userPatchName, setUserPatchName] = useState("")
+  const [errorMSG, setErrorMSG] = useState("")
+
+  // console.log(token)
+  // console.log(activeUser)
+  // console.log(errorMSG)
 
   const updateUser = (v) => {
     return setUser((prev) => {
@@ -54,10 +56,11 @@ const App = () => {
       },
       body: JSON.stringify(newPerson),
     })
+    .then(res => res.json())
     .then((res) => {
-      token = res.data.token;
+      token = res.token;
       localStorage.setItem('token', token);
-      setActiveUser(res.data.user);
+      setActiveUser(res.user);
       setUser({ name: "", email: "", password: ""});
       nav('/');
     })
@@ -80,41 +83,66 @@ const App = () => {
       },
       body: JSON.stringify(login),
     })
+    .then(res => {
+      if (res.status === 200) {
+        return res.json()
+      } else {
+        console.log(res);
+        throw new Error(res.message)
+      }
+    })
     .then((res) => {
-      console.log(res.data.token)
-      token = res.data.token;
+      token = res.token;
       localStorage.setItem('token', token);
-      setActiveUser(res.data.user);
+      setActiveUser(res.user);
       setUser({ name: "", email: "", password: ""});
       nav('/');
     })
     .catch(e => {
-      window.alert(e);
-      console.log(e);
-      return;
+      setErrorMSG(e.message ? e.message : null);
+      console.log(errorMSG);
     })
   }
 
-  async function userDelete(e) {
+  async function onUserPatch(e) {
     e.preventDefault();
 
-    const userId = "";
+    const userId = activeUser._id;
+    
+    await fetch(`http://localhost:5000/user/${userId}`, {
+      method: "PATCH",
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({ name: userPatchName}),
+    })
+    .then(res => res.json())
+    .then(res => {
+      setActiveUser(res.user);
+    })
+    .catch(err => console.error('Error patching', err))
+  }
+
+  async function onUserDelete(e) {
+    e.preventDefault();
+
+    const userId = activeUser._id;
   
-    fetch(`http://localhost:5000/user/${userId}`, {
+    await fetch(`http://localhost:5000/user/${userId}`, {
       method: "DELETE",
       headers: {
         'Content-Type': 'application/json',
-        authHeader,
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     })
     .then(res => {
-      console.log("Successfully deleted")
+      !res.ok ? console.log("Server Error") : console.log("Successfully deleted")
+      setActiveUser({});
     })
     .catch(err => {
       console.error('Error deleting', err);
     })
-
-
   }
 
   return (
@@ -129,7 +157,13 @@ const App = () => {
             </AccordionSummary>
 
             <AccordionDetails>
-              {token.length > 0 ? activeUser.name : <div>
+              {(!Object.keys(activeUser).length < 1) ? <div>
+                <Typography>{`Welcome ${activeUser.name}`}</Typography>
+                <Button variant="contained" onClick={() => {
+                  localStorage.removeItem('activeUser');
+                  localStorage.removeItem('token');                  
+                }}>Logout</Button>
+              </div> : <div>
                 <form className='userForm' onSubmit={onUserSubmit}>
                   <TextField label="Full Name" variant="standard" onChange={e => updateUser({ name: e.target.value })}/>
                   <TextField label="Email" variant="standard" onChange={e => updateUser({ email: e.target.value })}/>
@@ -148,6 +182,7 @@ const App = () => {
                   <TextField label="Password" variant="standard" onChange={e => updateUser({ password: e.target.value })}/>
                   <Button type="submit" variant="contained">Login</Button>
                 </form>
+                {errorMSG.length > 0 ? errorMSG : null}
               </div>}
             </AccordionDetails>
 
@@ -159,7 +194,14 @@ const App = () => {
             </AccordionSummary>
 
             <AccordionDetails>
-              <Button variant="contained" onClick={userDelete}>Delete User</Button>
+              {(Object.keys(activeUser).length < 1) ? "Please login or register" : 
+                <div>
+                  <form onSubmit={onUserPatch}>
+                    <TextField type="text" label="Name" variant="standard" onChange={(e) => setUserPatchName(e.target.value)}/>
+                    <Button type="submit" variant="contained">Change Name</Button>
+                  </form>
+                  <Button variant="contained" onClick={e => onUserDelete()}>Delete User</Button>
+                </div>}
             </AccordionDetails>
 
           </Accordion>
