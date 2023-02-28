@@ -9,6 +9,11 @@ router.post('/register', async (req, res) => {
 
         const { name, email, password } = req.body;
 
+        const emailRegex = /\S+@\S+\.\S+/;
+        if (!emailRegex.test(email)) {
+            return res.status(406).json({ message: 'Not an email' })
+        }
+
         const existingUser = await User.findOne({email});
 
         if (existingUser) {

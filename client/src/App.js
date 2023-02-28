@@ -53,6 +53,7 @@ const App = () => {
 
     if (!newPerson.name.length > 0 || !newPerson.password.length > 0 || !newPerson.email.length > 0) {
       setErrorMSG("Please add credentials")
+      setTimeout(() => setErrorMSG(""), 3000);
       return;
     }
 
@@ -63,7 +64,17 @@ const App = () => {
       },
       body: JSON.stringify(newPerson),
     })
-    .then(res => res.json())
+    .then(res => {
+      if (res.statusCode === 200) {
+        return res.json()
+      } else {
+        return res.json().then((err) => {
+          setErrorMSG(err.message);
+          setTimeout(() => setErrorMSG(""), 3000);
+          throw new Error(err.message);
+        })
+      }
+    })
     .then((res) => {
       console.log(res);
       token = res.token;
@@ -74,9 +85,7 @@ const App = () => {
       nav('/');
     })
     .catch(e => {
-      window.alert(e);
       console.log(e);
-      return;
     });
   }
 
@@ -87,7 +96,8 @@ const App = () => {
     const login = { email: user.email, password: user.password};
 
     if (!login.email || !login.password) {
-      setErrorMSG("Please add credentials")
+      setErrorMSG("Please add credentials");
+      setTimeout(() => setErrorMSG(""), 3000);
       return;
     }
 
@@ -105,7 +115,8 @@ const App = () => {
       } else {
         return res.json().then(err => {
           setErrorMSG(err.message ? err.message : null);
-          // throw new Error(err.message);
+          setTimeout(() => setErrorMSG(""), 3000);
+          throw new Error(err.message);
         });    
       }
     })
