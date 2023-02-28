@@ -47,8 +47,14 @@ const App = () => {
 
   async function onUserSubmit(e) {
     e.preventDefault();
+    setErrorMSG("");
 
     const newPerson = {...user};
+
+    if (!newPerson.name.length > 0 || !newPerson.password.length > 0 || !newPerson.email.length > 0) {
+      setErrorMSG("Please add credentials")
+      return;
+    }
 
     await fetch("http://localhost:5000/user/register", {
       method: "POST",
@@ -92,14 +98,15 @@ const App = () => {
       },
       body: JSON.stringify(login),
     })
-    .then(res => {
+    .then((res) => {
       console.log(res.status)
       if (res.status === 200) {
         return res.json()
       } else {
-        let err = res.json().Object.message
-        console.log(err)
-        throw new Error(err);
+        return res.json().then(err => {
+          setErrorMSG(err.message ? err.message : null);
+          // throw new Error(err.message);
+        });    
       }
     })
     .then((res) => {
@@ -110,10 +117,8 @@ const App = () => {
       setUser({ name: "", email: "", password: ""});
       nav('/');
     })
-    .catch(e => {
+    .catch((e) => {
       console.log(e);
-      setErrorMSG(e.message ? e.message : null);
-      console.log(errorMSG);
     })
   }
 
@@ -236,11 +241,11 @@ const App = () => {
 
               <br/>
 
-              <a>Bruh</a>
+              <p>Bruh</p>
 
               <br/>
 
-              <a>Moment</a>
+              <p>Moment</p>
 
             </Stack>
 
