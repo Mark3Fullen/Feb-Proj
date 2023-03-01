@@ -65,8 +65,17 @@ const App = () => {
       body: JSON.stringify(newPerson),
     })
     .then(res => {
-      if (res.statusCode === 200) {
-        return res.json()
+      console.log(res.status)
+      if (res.status === 200) {
+        return res.json().then((res) => {
+          console.log(res);
+          token = res.token;
+          localStorage.setItem('token', token);
+          setActiveUser(res.savedUser);
+          console.log({ activeUser} , localStorage.getItem('token'));
+          setUser({ name: "", email: "", password: ""});
+          nav('/');
+        })
       } else {
         return res.json().then((err) => {
           setErrorMSG(err.message);
@@ -74,15 +83,6 @@ const App = () => {
           throw new Error(err.message);
         })
       }
-    })
-    .then((res) => {
-      console.log(res);
-      token = res.token;
-      localStorage.setItem('token', token);
-      setActiveUser(res.savedUser);
-      console.log({ activeUser} , localStorage.getItem('token'));
-      setUser({ name: "", email: "", password: ""});
-      nav('/');
     })
     .catch(e => {
       console.log(e);
