@@ -1,22 +1,14 @@
 import './css/App.css';
+import HomeDrawer from './Comps/HomeDrawer';
 import UserPage from './Comps/UserPage'
 import HomePage from './Comps/HomePage'
 import AboutPage from './Comps/AboutPage'
+import HomeAccordion from './Comps/HomeAccordion';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, BrowserRouter, Route, Routes } from 'react-router-dom';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
 import Fab from '@mui/material/Fab';
-import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
-import Drawer from '@mui/material/Drawer';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 
 const App = () => {
 
@@ -194,91 +186,10 @@ const App = () => {
           <Link to="/">
             <Fab variant="extended" size="large" aria-label="add">App Name</Fab>
           </Link>
-          <Box className="userSettingsBox">
-            <Accordion>
+          
+          <HomeAccordion activeUser={activeUser} setActiveUser={setActiveUser} onUserSubmit={onUserSubmit} onUserLogin={onUserLogin} updateUser={updateUser} onUserPatch={onUserPatch} setUserPatchName={setUserPatchName} onUserDelete={onUserDelete} errorMSG={errorMSG}/>
 
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Account</Typography>
-              </AccordionSummary>
-
-              <AccordionDetails className='userSettingDetails'>
-                {(!Object.keys(activeUser).length < 1) ? <div>
-                  <Typography>{`Welcome ${activeUser.name}`}</Typography>
-                  <Button variant="contained" onClick={() => {
-                    localStorage.removeItem('activeUser');
-                    localStorage.removeItem('token');
-                    setActiveUser("");              
-                  }}>Logout</Button>
-                </div> : <div>
-                  <form className='userForm' onSubmit={onUserSubmit}>
-                    <TextField label="Full Name" variant="standard" onChange={e => updateUser({ name: e.target.value })}/>
-                    <TextField label="Email" variant="standard" onChange={e => updateUser({ email: e.target.value })}/>
-                    <TextField label="Password" variant="standard" onChange={e => updateUser({ password: e.target.value })}/>
-                    <Button type="submit" variant="contained">Create User</Button>
-                  </form>
-
-                  <br/>
-
-                  <Typography>Or</Typography>
-
-                  <br/>
-
-                  <form className='userForm' onSubmit={onUserLogin}>
-                    <TextField label="Email" variant="standard" onChange={e => updateUser({ email: e.target.value })}/>
-                    <TextField label="Password" variant="standard" onChange={e => updateUser({ password: e.target.value })}/>
-                    <Button type="submit" variant="contained">Login</Button>
-                  </form>
-                  {errorMSG.length > 0 ? errorMSG : null}
-                </div>}
-              </AccordionDetails>
-
-            </Accordion>
-            <Accordion>
-
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>Settings</Typography>
-              </AccordionSummary>
-
-              <AccordionDetails className='userSettingDetails'>
-                {(Object.keys(activeUser).length < 1) ? "Please login or register" : 
-                  <div>
-                    <form onSubmit={onUserPatch}>
-                      <TextField type="text" label="Name" variant="standard" onChange={(e) => setUserPatchName(e.target.value)}/>
-                      <Button type="submit" variant="contained">Change Name</Button>
-                    </form>
-                    <Button variant="contained" onClick={e => onUserDelete(e)}>Delete User</Button>
-                  </div>}
-              </AccordionDetails>
-
-            </Accordion>
-          </Box>
-          <Box className="userDrawerBox">
-            <MenuOutlinedIcon onClick={() => {
-              setDrawerOpen(!drawerOpen);
-              firstClickRef.current = true;
-              }} />
-            <Drawer anchor='left' open={drawerOpen} onClose={() => setDrawerOpen(false)} sx={{
-              width: '350px',
-              flexShrink: 0,
-              '& .MuiDrawer-paper': {
-                width: '350px',
-                boxSizing: 'border-box',
-              },
-            }}>
-              <Stack className='drawerStack' ref={drawerRef}>
-
-                {Object.keys(activeUser).length > 0 ? <Link to="/user">
-                  <Button variant="contained">User Menu</Button>
-                </Link> : null}
-                
-                <Link to="/about">
-                  <Button variant="contained">About Page</Button>
-                </Link>
-
-              </Stack>
-
-            </Drawer>
-          </Box>
+          <HomeDrawer drawerOpen={drawerOpen} setDrawerOpen={setDrawerOpen} drawerRef={drawerRef} firstClickRef={firstClickRef} activeUser={activeUser}/>
 
         </div>
 
