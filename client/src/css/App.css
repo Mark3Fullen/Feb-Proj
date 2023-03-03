@@ -40,7 +40,12 @@
 }
 
 .drawerStack{
-  padding: 75px;
+  padding: 7rem;
   align-items: center;
+  text-align: center;
+}
+
+.homeBody{
+  margin: 10rem;
   text-align: center;
 }

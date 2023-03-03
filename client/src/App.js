@@ -1,8 +1,9 @@
-import './App.css';
+import './css/App.css';
+import UserPage from './Comps/UserPage'
+import HomePage from './Comps/HomePage'
 
 import React, { useState } from 'react';
-import { useNavigate } from "react-router";
-
+import { Link, BrowserRouter, Route, Routes } from 'react-router-dom';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -17,13 +18,9 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 
 const App = () => {
-  
-  const nav = useNavigate();
 
   let token = ""
   
-  // let authHeader = { Authorization: `Bearer ${localStorage.getItem('token')}` };
-
   const [user, setUser] = useState({
     name: "",
     email: "",
@@ -33,10 +30,6 @@ const App = () => {
   const [userPatchName, setUserPatchName] = useState("")
   const [errorMSG, setErrorMSG] = useState("")
   const [drawerOpen, setDrawerOpen] = useState(false)
-
-  // console.log(token)
-  // console.log(activeUser)
-  // console.log(errorMSG)
 
   const updateUser = (v) => {
     return setUser((prev) => {
@@ -74,7 +67,6 @@ const App = () => {
           setActiveUser(res.savedUser);
           console.log({ activeUser} , localStorage.getItem('token'));
           setUser({ name: "", email: "", password: ""});
-          nav('/');
         })
       } else {
         return res.json().then((err) => {
@@ -126,7 +118,6 @@ const App = () => {
       console.log(localStorage.getItem('token'));
       setActiveUser(res.user);
       setUser({ name: "", email: "", password: ""});
-      nav('/');
     })
     .catch((e) => {
       console.log(e);
@@ -175,9 +166,12 @@ const App = () => {
   }
 
   return (
+    <BrowserRouter>
     <Box className="homeApp">
       <div className="homeHeader">
-        <Fab variant="extended" size="large" aria-label="add">App Name</Fab>
+        <Link to="/">
+          <Fab variant="extended" size="large" aria-label="add">App Name</Fab>
+        </Link>
         <Box className="userSettingsBox">
           <Accordion>
 
@@ -252,11 +246,13 @@ const App = () => {
 
               <br/>
 
-              <p>Bruh</p>
+              <p>PlaceHolder</p>
 
               <br/>
 
-              <p>Moment</p>
+              {Object.keys(activeUser).length > 0 ? <Link to="/user">
+                <Button variant="contained">User Menu</Button>
+              </Link> : null}
 
             </Stack>
 
@@ -264,11 +260,18 @@ const App = () => {
         </Box>   
       </div>
 
-      <div className="homeBody">
+      <div className="homeBody"> 
+          <Routes>
+            <Route path="/" element={<HomePage/>}/>
+          </Routes>
+          <Routes>
+            <Route path="/user" element={<UserPage user={activeUser}/>}/>
+          </Routes>
 
       </div>
 
     </Box>
+    </BrowserRouter>
   );
 }
 
